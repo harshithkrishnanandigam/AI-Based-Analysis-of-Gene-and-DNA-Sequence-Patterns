@@ -1,0 +1,32 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "dna-splice-junction-ai"
+version = "1.0.0"
+authors = [
+  { name="Harshith Krishna", email="harshith.krishna@example.com" },
+]
+description = "AI-Based Analysis of Gene and DNA Sequence Patterns for Splice-Junction Discovery"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "numpy>=1.24.0",
+    "pandas>=1.5.0",
+    "scipy>=1.10.0",
+    "scikit-learn>=1.3.0",
+    "xgboost>=2.0.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "joblib>=1.3.0",
+    "streamlit>=1.28.0",
+    "Pillow>=9.0.0",
+]

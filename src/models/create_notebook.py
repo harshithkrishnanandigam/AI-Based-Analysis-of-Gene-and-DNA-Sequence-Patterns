@@ -1,0 +1,376 @@
+import json
+from pathlib import Path
+
+notebook = {
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "# AI-Based Analysis of Gene and DNA Sequence Patterns\n",
+                "### **Course:** Introduction to Biological Data (Amrita Vishwa Vidyapeetham, Coimbatore)\n",
+                "### **Department:** Artificial Intelligence and Data Science (1st Year)\n",
+                "### **Role:** Person 3 — AI/ML Model Development & Evaluation\n",
+                "### **Lead:** Harshith Krishna (CB.AI.U4AID26023)\n",
+                "---\n",
+                "## 1. Project Overview & Role Objectives\n",
+                "In eukaryotic genomes, precursor messenger RNA (pre-mRNA) undergoes **splicing**, where non-coding sequences (**introns**) are excised and coding sequences (**exons**) are ligated together to form mature mRNA. Identifying splice junctions computationally is vital for **genome annotation**, **gene function discovery**, and **identifying disease-causing splice mutations**.\n\n",
+                "As **Person 3**, our core responsibilities are:\n",
+                "1. **Establish Baseline Models:** Implement Logistic Regression and Naive Bayes.\n",
+                "2. **Evaluate Diverse ML Architectures:** Train and compare Support Vector Machines (SVM), Random Forests, XGBoost, and Multi-Layer Perceptrons (MLP).\n",
+                "3. **Prevent Data Leakage & Overfitting:** Utilize 5-Fold Stratified Cross-Validation on the training split.\n",
+                "4. **Multi-Metric Holdout Evaluation:** Assess Accuracy, Balanced Accuracy, Macro/Weighted F1, and Multi-Class ROC-AUC (OvR).\n",
+                "5. **Hyperparameter Tuning:** Systematically optimize the best ensemble architectures.\n",
+                "6. **Biological Interpretability:** Extract feature importances and validate them against known molecular biology (donor GT consensus, acceptor AG consensus, and polypyrimidine tracts).\n",
+                "7. **Inference Engine:** Deliver a reusable prediction function for real-time inference and Streamlit integration."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# Import required libraries\n",
+                "import os\n",
+                "import sys\n",
+                "import time\n",
+                "import json\n",
+                "from pathlib import Path\n",
+                "from collections import Counter\n",
+                "\n",
+                "import numpy as np\n",
+                "import pandas as pd\n",
+                "import matplotlib.pyplot as plt\n",
+                "import seaborn as sns\n",
+                "import joblib\n",
+                "\n",
+                "from sklearn.preprocessing import LabelEncoder, StandardScaler\n",
+                "from sklearn.pipeline import Pipeline\n",
+                "from sklearn.model_selection import StratifiedKFold, cross_validate, GridSearchCV\n",
+                "from sklearn.metrics import (\n",
+                "    accuracy_score, balanced_accuracy_score,\n",
+                "    precision_score, recall_score, f1_score,\n",
+                "    roc_auc_score, confusion_matrix, classification_report,\n",
+                "    roc_curve, auc\n",
+                ")\n",
+                "from sklearn.linear_model import LogisticRegression\n",
+                "from sklearn.naive_bayes import GaussianNB\n",
+                "from sklearn.svm import SVC\n",
+                "from sklearn.ensemble import RandomForestClassifier\n",
+                "from sklearn.neural_network import MLPClassifier\n",
+                "from xgboost import XGBClassifier\n",
+                "\n",
+                "sns.set_theme(style='whitegrid', font_scale=1.0)\n",
+                "RANDOM_SEED = 42\n",
+                "np.random.seed(RANDOM_SEED)\n",
+                "print('All libraries imported successfully!')"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 2. Load Processed Datasets (Handshake with Person 2)\n",
+                "We load `X_train.csv`, `X_test.csv`, `y_train.csv`, and `y_test.csv` prepared by Person 2.\n",
+                "- Total sequence instances: 3,178 cleaned records.\n",
+                "- Train split (80%): 2,542 samples.\n",
+                "- Test split (20%): 636 samples.\n",
+                "- Feature dimensionality: 91 features (mononucleotide counts/frequencies, GC content, sequence length, ambiguity count, 16 dinucleotides, 64 trinucleotides)."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "base_dir = Path('..')\n",
+                "data_dir = base_dir / 'data' / 'processed'\n",
+                "\n",
+                "X_train = pd.read_csv(data_dir / 'X_train.csv')\n",
+                "X_test = pd.read_csv(data_dir / 'X_test.csv')\n",
+                "y_train_raw = pd.read_csv(data_dir / 'y_train.csv').iloc[:, 0].str.strip()\n",
+                "y_test_raw = pd.read_csv(data_dir / 'y_test.csv').iloc[:, 0].str.strip()\n",
+                "\n",
+                "label_encoder = LabelEncoder()\n",
+                "y_train = label_encoder.fit_transform(y_train_raw)\n",
+                "y_test = label_encoder.transform(y_test_raw)\n",
+                "\n",
+                "classes = list(label_encoder.classes_)\n",
+                "print(f'X_train shape: {X_train.shape} | y_train shape: {y_train.shape}')\n",
+                "print(f'X_test shape:  {X_test.shape}  | y_test shape:  {y_test.shape}')\n",
+                "print('Target Classes:', dict(zip(classes, range(len(classes)))))\n",
+                "print('\\nClass Distribution in Train:')\n",
+                "print(pd.Series(y_train_raw).value_counts())\n",
+                "print('\\nClass Distribution in Test:')\n",
+                "print(pd.Series(y_test_raw).value_counts())"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 3. Candidate Model Suite & Pipeline Construction\n",
+                "We define 6 diverse machine learning architectures to systematically test linear, probabilistic, kernel-based, tree ensemble, boosted, and neural representations:\n",
+                "1. **Logistic Regression (Baseline):** Multinomial linear model with L2 penalty and balanced class weighting.\n",
+                "2. **Gaussian Naive Bayes:** Generative probabilistic classifier assuming feature conditional independence.\n",
+                "3. **Support Vector Machine (RBF):** Kernelized margin classifier finding non-linear decision boundaries.\n",
+                "4. **Random Forest:** Bagged ensemble of 250 decision trees, capturing complex non-linear feature interactions.\n",
+                "5. **XGBoost:** Gradient boosted decision trees using second-order gradients and regularization.\n",
+                "6. **Multi-Layer Perceptron (MLP):** Feed-forward neural network with ReLU activations and Adam optimizer.\n\n",
+                "*Note: Standard scaling is wrapped into `sklearn.pipeline.Pipeline` to guarantee strict zero-leakage cross-validation.*"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "models = {\n",
+                "    'Logistic Regression (Baseline)': Pipeline([\n",
+                "        ('scaler', StandardScaler()),\n",
+                "        ('classifier', LogisticRegression(max_iter=1000, class_weight='balanced', random_state=RANDOM_SEED))\n",
+                "    ]),\n",
+                "    'Gaussian Naive Bayes': Pipeline([\n",
+                "        ('scaler', StandardScaler()),\n",
+                "        ('classifier', GaussianNB())\n",
+                "    ]),\n",
+                "    'Support Vector Machine (RBF)': Pipeline([\n",
+                "        ('scaler', StandardScaler()),\n",
+                "        ('classifier', SVC(kernel='rbf', C=1.5, gamma='scale', probability=True, class_weight='balanced', random_state=RANDOM_SEED))\n",
+                "    ]),\n",
+                "    'Random Forest': RandomForestClassifier(\n",
+                "        n_estimators=250, max_depth=16, min_samples_split=4, min_samples_leaf=2,\n",
+                "        class_weight='balanced', random_state=RANDOM_SEED, n_jobs=-1\n",
+                "    ),\n",
+                "    'XGBoost Classifier': XGBClassifier(\n",
+                "        n_estimators=250, max_depth=5, learning_rate=0.08, subsample=0.85, colsample_bytree=0.85,\n",
+                "        eval_metric='mlogloss', random_state=RANDOM_SEED, n_jobs=-1\n",
+                "    ),\n",
+                "    'Multi-Layer Perceptron (MLP)': Pipeline([\n",
+                "        ('scaler', StandardScaler()),\n",
+                "        ('classifier', MLPClassifier(hidden_layer_sizes=(128, 64), activation='relu', solver='adam', alpha=0.001, max_iter=400, early_stopping=True, random_state=RANDOM_SEED))\n",
+                "    ])\n",
+                "}\n",
+                "print(f'Initialized {len(models)} candidate models.')"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 4. Stratified 5-Fold Cross-Validation\n",
+                "Stratified 5-Fold Cross-Validation partitions `X_train` into 5 folds while preserving the relative proportions of EI, IE, and N classes across each split. This tests model stability and prevents overfitting."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "cv = StratifiedKFold(n_splits=5, shuffle=True, random_state=RANDOM_SEED)\n",
+                "cv_results = {}\n",
+                "\n",
+                "for name, model in models.items():\n",
+                "    t0 = time.time()\n",
+                "    scores = cross_validate(\n",
+                "        model, X_train, y_train, cv=cv,\n",
+                "        scoring={'acc': 'accuracy', 'f1_macro': 'f1_macro'}, n_jobs=-1\n",
+                "    )\n",
+                "    elapsed = time.time() - t0\n",
+                "    cv_results[name] = {\n",
+                "        'cv_acc_mean': scores['test_acc'].mean() * 100,\n",
+                "        'cv_acc_std': scores['test_acc'].std() * 100,\n",
+                "        'cv_f1_mean': scores['test_f1_macro'].mean(),\n",
+                "        'cv_f1_std': scores['test_f1_macro'].std(),\n",
+                "        'time_sec': elapsed\n",
+                "    }\n",
+                "    print(f\"[{name}] CV Acc: {cv_results[name]['cv_acc_mean']:.2f}% (±{cv_results[name]['cv_acc_std']:.2f}%) | Macro F1: {cv_results[name]['cv_f1_mean']:.4f}\")"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 5. Holdout Test Set Evaluation & Comparative Benchmark\n",
+                "Each model is trained on the full training set and evaluated on the unseen test set `X_test`. We log Accuracy, Balanced Accuracy, Macro Precision/Recall/F1, and Multi-Class ROC-AUC (One-vs-Rest)."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "benchmark_list = []\n",
+                "fitted_models = {}\n",
+                "predictions = {}\n",
+                "probabilities = {}\n",
+                "\n",
+                "for name, model in models.items():\n",
+                "    t0 = time.time()\n",
+                "    model.fit(X_train, y_train)\n",
+                "    train_time = time.time() - t0\n",
+                "    \n",
+                "    y_pred = model.predict(X_test)\n",
+                "    y_prob = model.predict_proba(X_test) if hasattr(model, 'predict_proba') else None\n",
+                "    \n",
+                "    fitted_models[name] = model\n",
+                "    predictions[name] = y_pred\n",
+                "    probabilities[name] = y_prob\n",
+                "    \n",
+                "    acc = accuracy_score(y_test, y_pred)\n",
+                "    bal_acc = balanced_accuracy_score(y_test, y_pred)\n",
+                "    macro_f1 = f1_score(y_test, y_pred, average='macro')\n",
+                "    weighted_f1 = f1_score(y_test, y_pred, average='weighted')\n",
+                "    roc_auc = roc_auc_score(y_test, y_prob, multi_class='ovr', average='macro') if y_prob is not None else np.nan\n",
+                "    \n",
+                "    benchmark_list.append({\n",
+                "        'Model': name,\n",
+                "        'CV Acc (%)': round(cv_results[name]['cv_acc_mean'], 2),\n",
+                "        'Test Acc (%)': round(acc * 100, 2),\n",
+                "        'Balanced Acc (%)': round(bal_acc * 100, 2),\n",
+                "        'Macro F1': round(macro_f1, 4),\n",
+                "        'Weighted F1': round(weighted_f1, 4),\n",
+                "        'ROC-AUC (OVR)': round(roc_auc, 4),\n",
+                "        'Train Time (s)': round(train_time, 2)\n",
+                "    })\n",
+                "\n",
+                "benchmark_df = pd.DataFrame(benchmark_list).sort_values(by='Macro F1', ascending=False).reset_index(drop=True)\n",
+                "print(benchmark_df.to_string())"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 6. Confusion Matrix Analysis\n",
+                "Visualizing confusion matrices across all candidate models to inspect error distributions between Exon-Intron (EI), Intron-Exon (IE), and Neither (N)."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "fig, axes = plt.subplots(2, 3, figsize=(16, 10))\n",
+                "axes = axes.flatten()\n",
+                "\n",
+                "for idx, (name, y_pred) in enumerate(predictions.items()):\n",
+                "    cm = confusion_matrix(y_test, y_pred)\n",
+                "    cm_norm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis] * 100\n",
+                "    \n",
+                "    annot = np.empty_like(cm).astype(str)\n",
+                "    for i in range(cm.shape[0]):\n",
+                "        for j in range(cm.shape[1]):\n",
+                "            annot[i, j] = f'{cm[i, j]}\\n({cm_norm[i, j]:.1f}%)'\n",
+                "            \n",
+                "    sns.heatmap(cm, annot=annot, fmt='', cmap='Blues', cbar=False, ax=axes[idx],\n",
+                "                xticklabels=classes, yticklabels=classes, annot_kws={'size': 10, 'weight': 'bold'})\n",
+                "    acc_val = accuracy_score(y_test, y_pred) * 100\n",
+                "    f1_val = f1_score(y_test, y_pred, average='macro')\n",
+                "    axes[idx].set_title(f'{name}\\nAcc: {acc_val:.1f}% | Macro F1: {f1_val:.3f}', fontsize=11, fontweight='bold')\n",
+                "    axes[idx].set_xlabel('Predicted Class', fontweight='bold')\n",
+                "    axes[idx].set_ylabel('True Class', fontweight='bold')\n",
+                "\n",
+                "plt.suptitle('DNA Splice Junction Classification: Confusion Matrix Across Models', fontsize=15, fontweight='bold', y=1.02)\n",
+                "plt.tight_layout()\n",
+                "plt.show()"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 7. Biological Interpretability: Feature Importance Analysis\n",
+                "Rather than deploying a black-box model, we extract tree feature importances (Gini gain) from Random Forest and XGBoost. We inspect whether the top predictive k-mers correspond to known molecular biology:\n",
+                "- **Donor Splice Site (EI):** Governed by the canonical 5' `GT` dinucleotide consensus.\n",
+                "- **Acceptor Splice Site (IE):** Governed by the 3' `AG` dinucleotide consensus preceded by a pyrimidine-rich tract (high `C` and `T` content).\n",
+                "- **Non-Splice (N):** Characterized by broad sequence distributions without localized consensus motifs."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "rf = fitted_models['Random Forest']\n",
+                "xgb = fitted_models['XGBoost Classifier']\n",
+                "\n",
+                "imp_df = pd.DataFrame({\n",
+                "    'Feature': X_train.columns,\n",
+                "    'RandomForest': rf.feature_importances_,\n",
+                "    'XGBoost': xgb.feature_importances_\n",
+                "})\n",
+                "imp_df['Mean_Importance'] = imp_df[['RandomForest', 'XGBoost']].mean(axis=1)\n",
+                "imp_df = imp_df.sort_values(by='Mean_Importance', ascending=False).reset_index(drop=True)\n",
+                "\n",
+                "print('Top 15 Most Important DNA Features:')\n",
+                "print(imp_df.head(15))\n",
+                "\n",
+                "plt.figure(figsize=(10, 6))\n",
+                "sns.barplot(data=imp_df.head(15), y='Feature', x='Mean_Importance', palette='viridis')\n",
+                "plt.title('Top 15 Predictive Sequence Motifs for Splice-Junction Recognition', fontsize=13, fontweight='bold')\n",
+                "plt.xlabel('Relative Importance Score', fontweight='bold')\n",
+                "plt.ylabel('Genomic Feature / k-mer Motif', fontweight='bold')\n",
+                "plt.tight_layout()\n",
+                "plt.show()"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 8. Real-Time Inference Demo (Testing Arbitrary DNA Sequences)\n",
+                "We test the production inference engine on sample sequences to demonstrate biological pattern classification."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "sys.path.append(str(base_dir / 'src' / 'models'))\n",
+                "from predict import DNAPatternPredictor\n",
+                "\n",
+                "predictor = DNAPatternPredictor(models_dir=base_dir / 'models_saved')\n",
+                "\n",
+                "# Test sequences\n",
+                "test_sample = 'CCAGCTGCATCACAGGAGGCCAGCGAGCAGGTCTGTTCCAAGGGCCTTCGAGCCAGTCTG'\n",
+                "res = predictor.predict(test_sample)\n",
+                "\n",
+                "print(f\"Predicted Class: {res['predicted_label']} - {res['predicted_name']}\")\n",
+                "print(f\"Confidence:      {res['confidence_percent']}%\")\n",
+                "print(f\"Class Probs:     {res['class_probabilities']}\")\n",
+                "print(f\"Biological Role: {res['biological_role']}\")\n",
+                "print(f\"Consensus Motif: {res['biological_consensus']}\")"
+            ]
+        }
+    ],
+    "metadata": {
+        "kernelspec": {
+            "display_name": "Python 3",
+            "language": "python",
+            "name": "python3"
+        },
+        "language_info": {
+            "name": "python",
+            "version": "3.14.0"
+        }
+    },
+    "nbformat": 4,
+    "nbformat_minor": 4
+}
+
+nb_path = Path(r"c:\Users\Harshith Krishna\Desktop\python projects\dna_sequence_ai\notebooks\Person_3_Model_Development.ipynb")
+nb_path.parent.mkdir(parents=True, exist_ok=True)
+with open(nb_path, "w", encoding="utf-8") as f:
+    json.dump(notebook, f, indent=2)
+
+print("Notebook successfully created at:", nb_path)

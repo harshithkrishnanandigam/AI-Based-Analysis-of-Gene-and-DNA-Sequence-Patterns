@@ -1,0 +1,105 @@
+{
+    "project_name": "AI-Based Analysis of Gene and DNA Sequence Patterns",
+    "task": "Splice-Junction Classification (Donor EI vs Acceptor IE vs Non-Splice N)",
+    "person_3_lead": "Harshith Krishna (CB.AI.U4AID26023)",
+    "classes": [
+        "EI",
+        "IE",
+        "N"
+    ],
+    "best_model": "XGBoost Classifier",
+    "models_evaluated": [
+        "Logistic Regression (Baseline)",
+        "Gaussian Naive Bayes",
+        "Support Vector Machine (RBF)",
+        "Random Forest",
+        "XGBoost Classifier",
+        "Multi-Layer Perceptron (MLP)"
+    ],
+    "benchmark_results": [
+        {
+            "Model": "XGBoost Classifier",
+            "CV Accuracy Mean (%)": 69.59,
+            "CV Accuracy Std (%)": 2.47,
+            "CV Macro F1": 0.6691,
+            "Test Accuracy (%)": 70.6,
+            "Balanced Accuracy (%)": 67.74,
+            "Macro Precision": 0.7047,
+            "Macro Recall": 0.6774,
+            "Macro F1-Score": 0.6885,
+            "Weighted F1-Score": 0.7036,
+            "ROC-AUC (Macro OVR)": 0.86,
+            "Training Time (s)": 2.19
+        },
+        {
+            "Model": "Support Vector Machine (RBF)",
+            "CV Accuracy Mean (%)": 65.54,
+            "CV Accuracy Std (%)": 0.73,
+            "CV Macro F1": 0.6473,
+            "Test Accuracy (%)": 68.71,
+            "Balanced Accuracy (%)": 70.3,
+            "Macro Precision": 0.6717,
+            "Macro Recall": 0.703,
+            "Macro F1-Score": 0.6822,
+            "Weighted F1-Score": 0.6886,
+            "ROC-AUC (Macro OVR)": 0.8491,
+            "Training Time (s)": 3.93
+        },
+        {
+            "Model": "Random Forest",
+            "CV Accuracy Mean (%)": 66.05,
+            "CV Accuracy Std (%)": 1.48,
+            "CV Macro F1": 0.6489,
+            "Test Accuracy (%)": 68.08,
+            "Balanced Accuracy (%)": 68.13,
+            "Macro Precision": 0.6653,
+            "Macro Recall": 0.6813,
+            "Macro F1-Score": 0.6721,
+            "Weighted F1-Score": 0.6817,
+            "ROC-AUC (Macro OVR)": 0.8468,
+            "Training Time (s)": 0.99
+        },
+        {
+            "Model": "Multi-Layer Perceptron (MLP)",
+            "CV Accuracy Mean (%)": 64.52,
+            "CV Accuracy Std (%)": 1.33,
+            "CV Macro F1": 0.6195,
+            "Test Accuracy (%)": 65.88,
+            "Balanced Accuracy (%)": 62.72,
+            "Macro Precision": 0.6474,
+            "Macro Recall": 0.6272,
+            "Macro F1-Score": 0.6341,
+            "Weighted F1-Score": 0.6551,
+            "ROC-AUC (Macro OVR)": 0.8184,
+            "Training Time (s)": 2.45
+        },
+        {
+            "Model": "Logistic Regression (Baseline)",
+            "CV Accuracy Mean (%)": 61.05,
+            "CV Accuracy Std (%)": 0.53,
+            "CV Macro F1": 0.6069,
+            "Test Accuracy (%)": 59.59,
+            "Balanced Accuracy (%)": 61.28,
+            "Macro Precision": 0.5824,
+            "Macro Recall": 0.6128,
+            "Macro F1-Score": 0.5894,
+            "Weighted F1-Score": 0.5987,
+            "ROC-AUC (Macro OVR)": 0.7864,
+            "Training Time (s)": 0.39
+        },
+        {
+            "Model": "Gaussian Naive Bayes",
+            "CV Accuracy Mean (%)": 51.18,
+            "CV Accuracy Std (%)": 2.39,
+            "CV Macro F1": 0.5136,
+            "Test Accuracy (%)": 51.42,
+            "Balanced Accuracy (%)": 56.38,
+            "Macro Precision": 0.5307,
+            "Macro Recall": 0.5638,
+            "Macro F1-Score": 0.5162,
+            "Weighted F1-Score": 0.5125,
+            "ROC-AUC (Macro OVR)": 0.7264,
+            "Training Time (s)": 0.03
+        }
+    ]
+}
