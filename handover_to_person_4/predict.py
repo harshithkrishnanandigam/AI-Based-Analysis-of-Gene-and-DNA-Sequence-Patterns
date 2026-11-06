@@ -112,7 +112,20 @@ class DNAPatternPredictor:
     """
     def __init__(self, models_dir: Union[str, Path] = None):
         if models_dir is None:
-            models_dir = Path(__file__).resolve().parent.parent.parent / "models_saved"
+            candidates = [
+                Path(__file__).resolve().parent / "models_saved",
+                Path(__file__).resolve().parent.parent.parent / "models_saved",
+                Path.cwd() / "models_saved",
+                Path(__file__).resolve().parent / ".." / "models_saved",
+            ]
+            for cand in candidates:
+                cand = cand.resolve()
+                if cand.exists() and (cand / "best_model.joblib").exists():
+                    models_dir = cand
+                    break
+            if models_dir is None:
+                models_dir = candidates[1].resolve()
+
         self.models_dir = Path(models_dir)
 
         model_path = self.models_dir / "best_model.joblib"

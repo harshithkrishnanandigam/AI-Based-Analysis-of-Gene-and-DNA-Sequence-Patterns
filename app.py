@@ -18,10 +18,12 @@ import pandas as pd
 import streamlit as st
 from PIL import Image
 
-# Ensure current directory is accessible
+# Ensure both current directory and src/models are in sys.path
 current_dir = Path(__file__).resolve().parent
-if str(current_dir) not in sys.path:
-    sys.path.append(str(current_dir))
+for p in [current_dir, current_dir / "src" / "models"]:
+    p_str = str(p.resolve())
+    if p_str not in sys.path:
+        sys.path.insert(0, p_str)
 
 # Check for models_saved location
 models_dir = current_dir / "models_saved"
@@ -31,7 +33,10 @@ if not models_dir.exists():
 results_dir = current_dir / "results"
 figures_dir = results_dir / "figures"
 
-from predict import predict_dna_sequence, extract_sequence_features, SPLICE_SITE_METADATA
+try:
+    from predict import predict_dna_sequence, extract_sequence_features, SPLICE_SITE_METADATA
+except ImportError:
+    from src.models.predict import predict_dna_sequence, extract_sequence_features, SPLICE_SITE_METADATA
 
 # ==============================================================================
 # PAGE CONFIGURATION & METADATA
