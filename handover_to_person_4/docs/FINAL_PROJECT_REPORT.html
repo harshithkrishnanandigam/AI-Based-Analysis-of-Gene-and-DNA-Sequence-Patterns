@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Based Analysis of Gene and DNA Sequence Patterns | Research Report</title>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Merriweather', serif;
+            color: #1F2937;
+            line-height: 1.8;
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 30px;
+            background: #FAFAFA;
+        }
+        .report-paper {
+            background: #FFFFFF;
+            padding: 60px 70px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            border-radius: 8px;
+            border: 1px solid #E5E7EB;
+        }
+        h1, h2, h3, h4, .sans {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #111827;
+            line-height: 1.25;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.15rem;
+            color: #4B5563;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 25px;
+        }
+        .author-box {
+            text-align: center;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.95rem;
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid #E5E7EB;
+            color: #374151;
+        }
+        .abstract-box {
+            background: #F3F4F6;
+            border-left: 4px solid #2563EB;
+            padding: 20px 24px;
+            border-radius: 4px;
+            margin: 30px 0;
+            font-size: 0.95rem;
+        }
+        .abstract-box h3 {
+            color: #1E3A8A;
+            margin-top: 0;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1E3A8A;
+            margin-top: 40px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #E5E7EB;
+            padding-bottom: 6px;
+        }
+        h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #1F2937;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        p {
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 10px 14px;
+            border: 1px solid #D1D5DB;
+            text-align: left;
+        }
+        th {
+            background: #F3F4F6;
+            font-weight: 700;
+            color: #111827;
+        }
+        tr:nth-child(even) {
+            background: #F9FAFB;
+        }
+        .figure-container {
+            text-align: center;
+            margin: 30px 0;
+        }
+        .figure-container img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 6px;
+            border: 1px solid #E5E7EB;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        .figure-caption {
+            font-size: 0.88rem;
+            color: #6B7280;
+            margin-top: 8px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-style: italic;
+        }
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            background: #EEF2F6;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            color: #C026D3;
+        }
+        .print-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #2563EB;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 30px;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
+            cursor: pointer;
+            z-index: 100;
+        }
+        @media print {
+            body {
+                background: white;
+                margin: 0;
+                padding: 0;
+            }
+            .report-paper {
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            .print-btn {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+
+    <div class="report-paper">
+        <h1>AI-Based Analysis of Gene and DNA Sequence Patterns</h1>
+        <div class="subtitle">Machine Learning for Genomic Splice-Junction Discovery & Pattern Recognition</div>
+
+        <div class="author-box">
+            <b>Department of Artificial Intelligence and Data Science (1st Year)</b><br>
+            <b>Amrita Vishwa Vidyapeetham, Coimbatore</b><br><br>
+            <b>Authors & Work Division:</b><br>
+            Mowliya (CB.AI.U4AID26021) — <i>Person 1: Dataset Collection & Research</i><br>
+            Kaushik Varma (CB.AI.U4AID26022) — <i>Person 2: Data Cleaning & Feature Engineering</i><br>
+            Harshith Krishna (CB.AI.U4AID26023) — <i>Person 3: AI/ML Model Lead</i><br>
+            Naren (CB.AI.U4AID26024) — <i>Person 4: Visualization, Integration & Reporting</i>
+        </div>
+
+        <div class="abstract-box">
+            <h3>Abstract</h3>
+            <p>
+                Splice junctions are critical genomic boundaries in eukaryotic pre-messenger RNA (pre-mRNA) where non-coding introns are excised and coding exons are joined to synthesize functional proteins. Aberrant splicing caused by single-nucleotide mutations is a major driver of hereditary diseases and oncogenesis. In this project, we present an end-to-end artificial intelligence framework to classify 60-base pair primate DNA sequences into three biological categories: Exon-to-Intron donor junctions (EI), Intron-to-Exon acceptor junctions (IE), and non-splice regions (Neither / N).
+            </p>
+            <p>
+                Using the curated UCI Molecular Biology Splice-Junction benchmark (3,178 non-redundant sequences), we extracted a 91-dimensional tabular feature space comprising mononucleotide frequencies, GC content, sequence lengths, 16 dinucleotides (2-mers), and 64 trinucleotides (3-mers). We systematically benchmarked six diverse machine learning architectures: Logistic Regression, Gaussian Naive Bayes, Support Vector Machines (SVM-RBF), Random Forest, XGBoost, and Multi-Layer Perceptrons (MLP) under strict 5-fold Stratified Cross-Validation.
+            </p>
+            <p>
+                On an unseen holdout test set of 636 sequences, <b>XGBoost achieved the highest performance with 70.60% Test Accuracy, a Balanced Accuracy of 67.74%, a Macro F1-score of 0.6885, and an impressive Multi-Class One-vs-Rest ROC-AUC of 0.8600</b>, outperforming linear baselines by over 11%. Furthermore, tree-based feature importance analysis revealed that the top predictive features correspond directly to known molecular biology: the universal 5' donor <code>GT</code> consensus (<code>3mer_GGT</code>, <code>3mer_GTA</code>), the 3' acceptor <code>AG</code> consensus (<code>3mer_AGG</code>, <code>3mer_CAG</code>), and upstream polypyrimidine tracts (<code>2mer_TC</code>, <code>3mer_CTC</code>). Finally, the entire workflow was packaged into an interactive Streamlit web dashboard for real-time genomic inference.
+            </p>
+        </div>
+
+        <h2>1. Introduction & Biological Background</h2>
+        <p>
+            In eukaryotic organisms, genomic DNA consists of split genes featuring alternating coding sequences (<b>exons</b>) and non-coding sequences (<b>introns</b>). The Central Dogma of Molecular Biology dictates that DNA is transcribed into precursor messenger RNA (pre-mRNA). Before translation into proteins can occur, pre-mRNA undergoes <b>splicing</b>, an essential post-transcriptional modification orchestrated by the <b>spliceosome</b> (a multi-megadalton ribonucleoprotein complex).
+        </p>
+        <p>The spliceosome recognizes specific consensus sequences at the intron-exon boundaries:</p>
+        <ul>
+            <li><b>Donor Splice Site (Exon &rarr; Intron / EI):</b> The 5' boundary of an intron, universally characterized by a conserved <code>GT</code> (in DNA) or <code>GU</code> (in RNA) dinucleotide.</li>
+            <li><b>Acceptor Splice Site (Intron &rarr; Exon / IE):</b> The 3' boundary of an intron, universally terminating with a conserved <code>AG</code> dinucleotide, preceded by a <b>Polypyrimidine Tract</b> rich in cytosine (C) and thymine (T).</li>
+            <li><b>Non-Splice Sequences (Neither / N):</b> Intragenic or intergenic sequences that contain no splicing activity.</li>
+        </ul>
+
+        <div class="figure-container">
+            <img src="../results/figures/eda_positional_nucleotides.png" alt="Positional Nucleotide Distribution">
+            <div class="figure-caption">Figure 1: Positional Nucleotide Distribution across 60-bp Primate DNA Splice Junctions. Demonstrates the near 100% consensus spikes at positions 31-32 (GT for EI) and positions 29-30 (AG for IE with upstream polypyrimidine tract).</div>
+        </div>
+
+        <h2>2. Dataset Collection & Preprocessing (Persons 1 & 2)</h2>
+        <p>
+            The benchmark dataset was sourced from the UCI Machine Learning Repository (Molecular Biology Primate Splice-Junction Gene Sequences, GenBank 64.1). After cleaning whitespace and removing 12 duplicate sequences, 3,178 non-redundant records were retained.
+        </p>
+        <p>
+            Person 2 extracted 91 features per sequence: 8 mononucleotide metrics (counts & frequencies of A, C, G, T), GC Content (%), sequence length, ambiguity count, 16 dinucleotides (2-mers), and 64 trinucleotides (3-mers). An 80/20 stratified split partitioned the dataset into 2,542 training samples and 636 holdout testing samples.
+        </p>
+
+        <div class="figure-container">
+            <img src="../results/figures/eda_gc_distributions.png" alt="GC Content and Composition">
+            <div class="figure-caption">Figure 2: GC Content violin distributions and average nucleotide frequencies across the biological classes.</div>
+        </div>
+
+        <h2>3. Machine Learning Benchmark & Experimental Results (Person 3)</h2>
+        <p>
+            Person 3 implemented 6 diverse machine learning architectures under strict 5-fold Stratified Cross-Validation using scikit-learn Pipelines to eliminate data leakage. The models were evaluated on the 636 unseen holdout test samples:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Model Architecture</th>
+                    <th>5-Fold CV Acc</th>
+                    <th>Test Accuracy</th>
+                    <th>Balanced Acc</th>
+                    <th>Macro F1</th>
+                    <th>ROC-AUC (OvR)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="background: #D1FAE5; font-weight: bold;">
+                    <td>⭐ XGBoost Classifier (Champion)</td>
+                    <td>69.59% &plusmn; 2.47%</td>
+                    <td>70.60%</td>
+                    <td>67.74%</td>
+                    <td>0.6885</td>
+                    <td>0.8600</td>
+                </tr>
+                <tr>
+                    <td>Support Vector Machine (RBF)</td>
+                    <td>65.54% &plusmn; 0.73%</td>
+                    <td>68.71%</td>
+                    <td>70.30%</td>
+                    <td>0.6822</td>
+                    <td>0.8491</td>
+                </tr>
+                <tr>
+                    <td>Random Forest (250 Trees)</td>
+                    <td>66.05% &plusmn; 1.48%</td>
+                    <td>68.08%</td>
+                    <td>68.13%</td>
+                    <td>0.6721</td>
+                    <td>0.8468</td>
+                </tr>
+                <tr>
+                    <td>Multi-Layer Perceptron (MLP)</td>
+                    <td>64.52% &plusmn; 1.33%</td>
+                    <td>65.88%</td>
+                    <td>62.72%</td>
+                    <td>0.6341</td>
+                    <td>0.8184</td>
+                </tr>
+                <tr>
+                    <td>Logistic Regression (Baseline)</td>
+                    <td>61.05% &plusmn; 0.53%</td>
+                    <td>59.59%</td>
+                    <td>61.28%</td>
+                    <td>0.5894</td>
+                    <td>0.7864</td>
+                </tr>
+                <tr>
+                    <td>Gaussian Naive Bayes</td>
+                    <td>51.18% &plusmn; 2.39%</td>
+                    <td>51.42%</td>
+                    <td>56.38%</td>
+                    <td>0.5162</td>
+                    <td>0.7264</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="figure-container">
+            <img src="../results/figures/roc_pr_curves_combined.png" alt="Diagnostic ROC and PR Curves">
+            <div class="figure-caption">Figure 3: Multi-class One-vs-Rest ROC Curves and Precision-Recall Curves for XGBoost on holdout test data (AUC = 0.860).</div>
+        </div>
+
+        <h2>4. Explainable AI & Biological Validation</h2>
+        <p>
+            Feature importance analysis across the 91 features demonstrated that the machine learning models autonomously discovered the biochemical grammar of the spliceosome without manual rule coding:
+        </p>
+
+        <div class="figure-container">
+            <img src="../results/figures/xai_top_motifs_biology.png" alt="Top Motifs Feature Importance">
+            <div class="figure-caption">Figure 4: Explainable AI: Top 20 predictive sequence features driving splice junction recognition and their biological consensus alignment.</div>
+        </div>
+
+        <h2>5. Web Deployment & Real-World Integration (Person 4)</h2>
+        <p>
+            Person 4 integrated the entire preprocessing logic and trained XGBoost model into an interactive Streamlit web dashboard (<code>app.py</code>). The platform features an interactive DNA sequence visualizer with color-coded nucleotides, real-time confidence scores, and high-throughput batch FASTA processing with downloadable CSV annotations.
+        </p>
+
+        <h2>6. Conclusion</h2>
+        <p>
+            This project successfully demonstrates the synergy of machine learning and computational genomics. By transforming raw nucleotide strings into biologically relevant k-mer representations, our XGBoost classifier achieved 70.60% accuracy and 0.8600 ROC-AUC on primate splice junctions, verified via explainable AI and deployed as an interactive web dashboard.
+        </p>
+    </div>
+</body>
+</html>
